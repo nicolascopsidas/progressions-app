@@ -440,7 +440,15 @@ const PROGS=[
   {id:'pedale',g:'Impressionnisme',name:'Pédale de tonique',ch:'Imaj9 II7 IVmaj7 bVIImaj7',bpm:64,pedal:true,
    formula:'Imaj9 – II7 – IVmaj7 – ♭VIImaj7, basse tenue sur I',
    desc:'La basse reste sur la tonique pendant que les accords changent au-dessus. Puisque le sol ne bouge pas, aucun accord n’a besoin de se résoudre.',
-   ex:'Un procédé constant chez Debussy et Ravel.'}
+   ex:'Un procédé constant chez Debussy et Ravel.'},
+
+  {id:'emotions',g:'Jazz & soul',name:'Une émotion par accord',key:2,bpm:72,fixed:true,
+   ch:'i9 bVImaj7#11 iv9 V7sus4 i9 bIIImaj9 bVIIadd9 iv9 V7b9 bVImaj9 bIIImaj7 iv11 i9 bIImaj7#11 V7sus4 V7b9 i9',
+   b:[4,4,4,4,4,4,4,4,4,4,4,4,4,4,2,2,4],formula:'16 mesures en ré mineur · i9, ♭VI, iv, V et leurs couleurs',
+   moods:['l’effort','l’inattendu','la persistance','le revers','le renfort','le soulagement','le doute','l’urgence','le repos',
+     'la conquête','tu me manques','ça aurait pu être','mais ça ne sera pas','mais pourquoi ?','je ne sais pas','mais…','ça va'],
+   desc:'Une longue grille en mineur, faite uniquement d’accords enrichis : neuvièmes, onzièmes, quartes augmentées. Elle s’éloigne vers le ♭VI et le ♭III, s’assombrit avec le ♭II, et retombe chaque fois sur le i9. Pendant la lecture, chaque accord affiche l’émotion qu’un auditeur lui a prêtée.',
+   ex:'Relevée dans un commentaire YouTube qui donne un mot à chaque accord, de « l’effort » à « ça va ».'}
 ];
 const PALETTE=[
   ['Diatoniques',['I','ii','iii','IV','V','vi','vii°']],
@@ -466,19 +474,21 @@ const TONES={
   m7:[[0,0],[3,2],[7,4],[10,6]], m7b5:[[0,0],[3,2],[6,4],[10,6]], dim7:[[0,0],[3,2],[6,4],[9,6]],
   '6':[[0,0],[4,2],[7,4],[9,5]], m6:[[0,0],[3,2],[7,4],[9,5]], '9':[[0,0],[4,2],[10,6],[14,1]],
   m9:[[0,0],[3,2],[10,6],[14,1]], mMaj7:[[0,0],[3,2],[7,4],[11,6]], add9:[[0,0],[4,2],[7,4],[14,1]],
-  maj9:[[0,0],[4,2],[11,6],[14,1]]
+  maj9:[[0,0],[4,2],[11,6],[14,1]], maj7s11:[[0,0],[4,2],[11,6],[18,3]], '7sus4':[[0,0],[5,3],[7,4],[10,6]],
+  '7b9':[[0,0],[4,2],[10,6],[13,1]], m11:[[0,0],[3,2],[10,6],[14,1],[17,3]], '11':[[0,0],[7,4],[10,6],[14,1],[17,3]]
 };
 const QSYM={maj:'',m:'m',dim:'°',aug:'+',sus4:'sus4','7':'7',maj7:'maj7',m7:'m7',m7b5:'m7♭5',dim7:'°7',
-  '6':'6',m6:'m6','9':'9',m9:'m9',mMaj7:'m(maj7)',add9:'add9',maj9:'maj9'};
+  '6':'6',m6:'m6','9':'9',m9:'m9',mMaj7:'m(maj7)',add9:'add9',maj9:'maj9',maj7s11:'maj7♯11','7sus4':'7sus4','7b9':'7♭9',m11:'m11','11':'11'};
 const QFR={maj:'majeur',m:'mineur',dim:'diminué',aug:'augmenté',sus4:'suspendu',
   '7':'septième de dominante',maj7:'septième majeure',m7:'mineur septième',m7b5:'demi-diminué',dim7:'septième diminuée',
   '6':'majeur sixte',m6:'mineur sixte','9':'neuvième de dominante',m9:'mineur neuvième',mMaj7:'mineur septième majeure',add9:'neuvième ajoutée',
-  maj9:'neuvième majeure'};
+  maj9:'neuvième majeure',maj7s11:'septième majeure, onzième augmentée','7sus4':'septième suspendue','7b9':'septième, neuvième mineure',
+  m11:'mineur onzième','11':'onzième'};
 const RSUF={maj:'',m:'','7':'7',maj7:'maj7',m7:'7',mMaj7:'(maj7)','6':'6',m6:'6','9':'9',m9:'9',
-  dim:'°',dim7:'°7',m7b5:'ø7',aug:'+',sus4:'sus4',add9:'add9',maj9:'maj9'};
-const LOWER_Q=new Set(['m','m7','mMaj7','m6','m9','dim','dim7','m7b5']);
+  dim:'°',dim7:'°7',m7b5:'ø7',aug:'+',sus4:'sus4',add9:'add9',maj9:'maj9',maj7s11:'maj7♯11','7sus4':'7sus4','7b9':'7♭9',m11:'11','11':'11'};
+const LOWER_Q=new Set(['m11','m7','mMaj7','m6','m9','dim','dim7','m7b5']);
 const NUMS=['I','II','III','IV','V','VI','VII'];
-const RE=/^([b#])?(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)([°ø+])?(maj9|maj7|sus4|add9|7|6|9)?$/;
+const RE=/^([b#])?(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)([°ø+])?(maj9|maj7#11|maj7|7sus4|7b9|sus4|add9|11|7|6|9)?$/;
 
 function parseRoman(s){
   const m=RE.exec(s); if(!m) throw new Error('Degré illisible : '+s);
@@ -488,8 +498,8 @@ function parseRoman(s){
   if(mod==='ø') q='m7b5';
   else if(mod==='°') q=suf==='7'?'dim7':'dim';
   else if(mod==='+') q='aug';
-  else if(upper) q={'':'maj','7':'7',maj7:'maj7',maj9:'maj9','6':'6','9':'9',sus4:'sus4',add9:'add9'}[suf];
-  else q={'':'m','7':'m7',maj7:'mMaj7',maj9:'m9','6':'m6','9':'m9',sus4:'sus4',add9:'add9'}[suf];
+  else if(upper) q={'':'maj','7':'7',maj7:'maj7',maj9:'maj9','6':'6','9':'9',sus4:'sus4',add9:'add9','maj7#11':'maj7s11','7sus4':'7sus4','7b9':'7b9','11':'11'}[suf];
+  else q={'':'m','7':'m7',maj7:'mMaj7',maj9:'m9','6':'m6','9':'m9',sus4:'sus4',add9:'add9','11':'m11','7sus4':'7sus4'}[suf];
   return {deg,acc,semis:NAT[deg-1]+acc,upper,q};
 }
 function enrich(c){
@@ -573,11 +583,13 @@ const OPEN={'0:maj':'x32010','2:maj':'xx0232','4:maj':'022100','7:maj':'320003',
   '9:m':'x02210','2:m':'xx0231','4:m':'022000','0:7':'x32310','2:7':'xx0212','4:7':'020100','7:7':'320001','9:7':'x02020','11:7':'x21202',
   '9:m7':'x02010','2:m7':'xx0211','4:m7':'020000','0:maj7':'x32000','2:maj7':'xx0222','4:maj7':'021100','5:maj7':'xx3210','7:maj7':'320002','9:maj7':'x02120',
   '0:add9':'x32030','7:add9':'320203','2:sus4':'xx0233','9:sus4':'x02230','4:sus4':'022200','0:sus4':'x33011','7:sus4':'330013',
-  '2:6':'xx0202','9:6':'x02222','4:6':'022120','0:6':'x32210','11:m7b5':'x2323x','4:9':'020132','0:9':'x32333'};
+  '2:6':'xx0202','9:6':'x02222','4:6':'022120','0:6':'x32210','11:m7b5':'x2323x','4:9':'020132','0:9':'x32333','9:7sus4':'x02030','2:7sus4':'xx0213','4:7sus4':'020200','9:7b9':'x02323'};
 const SHAPE_E={maj:[0,2,2,1,0,0],m:[0,2,2,0,0,0],'7':[0,2,0,1,0,0],m7:[0,2,0,0,0,0],maj7:[0,null,1,1,0,null],m7b5:[0,null,0,0,-1,null],
-  dim7:[0,null,-1,0,-1,null],'6':[0,null,-1,1,0,null],m6:[0,null,-1,0,0,null],sus4:[0,2,2,2,0,0],aug:[0,null,2,1,1,null],mMaj7:[0,null,1,0,0,null]};
+  dim7:[0,null,-1,0,-1,null],'6':[0,null,-1,1,0,null],m6:[0,null,-1,0,0,null],sus4:[0,2,2,2,0,0],aug:[0,null,2,1,1,null],mMaj7:[0,null,1,0,0,null],
+  m9:[0,2,0,0,0,2],'7sus4':[0,2,0,2,0,0],'7b9':[0,null,0,1,0,1],m11:[0,null,0,0,-2,null]};
 const SHAPE_A={maj:[0,2,2,2,0],m:[0,2,2,1,0],'7':[0,2,0,2,0],m7:[0,2,0,1,0],maj7:[0,2,1,2,0],m7b5:[0,1,0,1,null],dim7:[0,1,-1,1,null],
-  '6':[0,2,2,2,2],m6:[0,-2,-1,-2,null],'9':[0,-1,0,0,0],m9:[0,-2,0,0,0],maj9:[0,-1,1,0,null],sus4:[0,2,2,3,0],aug:[0,-1,-2,-2,null],mMaj7:[0,2,1,1,0]};
+  '6':[0,2,2,2,2],m6:[0,-2,-1,-2,null],'9':[0,-1,0,0,0],m9:[0,-2,0,0,0],maj9:[0,-1,1,0,null],sus4:[0,2,2,3,0],aug:[0,-1,-2,-2,null],mMaj7:[0,2,1,1,0],
+  '7sus4':[0,2,0,3,0],'7b9':[0,2,3,2,3],maj7s11:[0,-1,1,null,-1]};
 function parseTab(t){return t.split('').map(c=>c==='x'?-1:+c);}
 function shapeInfo(fr){
   const notes=[];fr.forEach((f,i)=>{if(f>=0)notes.push(GTR[i]+f);});
@@ -616,7 +628,7 @@ function guitarShape(ch,bassPc,prevPos){
   return searchShape(ch,bassPc,prevPos);
 }
 function searchShape(ch,bassPc,prevPos){
-  const req=ch.tones.filter((t,k)=>!(ch.tones.length>=4&&ch.steps[k]===4)).map(t=>t.pc);
+  const req=ch.tones.filter((t,k)=>!((ch.tones.length>=4&&ch.steps[k]===4)||(ch.tones.length>=5&&ch.steps[k]===1))).map(t=>t.pc);
   const allow=new Set(ch.tones.map(t=>t.pc));allow.add(bassPc);
   const fifth=ch.tones.find((t,k)=>ch.steps[k]===4);
   let best=null,bs=Infinity;
@@ -866,7 +878,8 @@ function showChord(i){
   shownIdx=i;const ch=TL.chords[i];
   if(!ch){$('#now-name').textContent='—';$('#now-roman').textContent='';$('#now-tones').textContent='';$('#now-bass').innerHTML='';paintKeys(null);return;}
   $('#now-name').textContent=chordLabel(ch);
-  $('#now-roman').textContent=`${ch.roman} · ${QFR[ch.q]}`;
+  const mood=TL.p.moods&&TL.p.moods[i];
+  $('#now-roman').textContent=`${ch.roman} · ${QFR[ch.q]}`+(mood?` · « ${mood} »`:'');
   $('#now-tones').textContent=ch.tones.map(nn).join(' · ');
   $('#now-bass').innerHTML=bassActive()?`Basse&nbsp;: <b>${nn(ch.bassSp)}</b>${TL.p.pedal?' (pédale)':''}`:'Sans basse';
   paintKeys(ch,ch.voicing,bassActive()?ch.bass:null);
@@ -1157,6 +1170,7 @@ function selectProg(id){
   if(id===state.progId&&TL)return;
   state.progId=id;
   const p=PROGS.find(x=>x.id===id);if(p&&p.bpm){state.bpm=p.bpm;syncTempo();}
+  if(p&&p.key!=null){state.key=p.key;$('#key').value=String(p.key);}
   rebuild(false);markLibrary();
   if(playing)seek(0);
   save();
