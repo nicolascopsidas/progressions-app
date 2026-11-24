@@ -442,13 +442,11 @@ const PROGS=[
    desc:'La basse reste sur la tonique pendant que les accords changent au-dessus. Puisque le sol ne bouge pas, aucun accord n’a besoin de se résoudre.',
    ex:'Un procédé constant chez Debussy et Ravel.'},
 
-  {id:'emotions',g:'Jazz & soul',name:'Une émotion par accord',key:2,bpm:72,fixed:true,
+  {id:'emotions',g:'Jazz & soul',name:'Mineur enrichi',key:2,bpm:72,fixed:true,
    ch:'i9 bVImaj7#11 iv9 V7sus4 i9 bIIImaj9 bVIIadd9 iv9 V7b9 bVImaj9 bIIImaj7 iv11 i9 bIImaj7#11 V7sus4 V7b9 i9',
    b:[4,4,4,4,4,4,4,4,4,4,4,4,4,4,2,2,4],formula:'16 mesures en ré mineur · i9, ♭VI, iv, V et leurs couleurs',
-   moods:['l’effort','l’inattendu','la persistance','le revers','le renfort','le soulagement','le doute','l’urgence','le repos',
-     'la conquête','tu me manques','ça aurait pu être','mais ça ne sera pas','mais pourquoi ?','je ne sais pas','mais…','ça va'],
-   desc:'Une longue grille en mineur, faite uniquement d’accords enrichis : neuvièmes, onzièmes, quartes augmentées. Elle s’éloigne vers le ♭VI et le ♭III, s’assombrit avec le ♭II, et retombe chaque fois sur le i9. Pendant la lecture, chaque accord affiche l’émotion qu’un auditeur lui a prêtée.',
-   ex:'Relevée dans un commentaire YouTube qui donne un mot à chaque accord, de « l’effort » à « ça va ».'}
+   desc:'Une longue grille en mineur, faite uniquement d’accords enrichis : neuvièmes, onzièmes, quartes augmentées. Elle s’éloigne vers le ♭VI et le ♭III, s’assombrit avec le ♭II, et retombe chaque fois sur le i9.',
+   ex:'Relevée dans un commentaire YouTube.'}
 ];
 const PALETTE=[
   ['Diatoniques',['I','ii','iii','IV','V','vi','vii°']],
@@ -878,8 +876,7 @@ function showChord(i){
   shownIdx=i;const ch=TL.chords[i];
   if(!ch){$('#now-name').textContent='—';$('#now-roman').textContent='';$('#now-tones').textContent='';$('#now-bass').innerHTML='';paintKeys(null);return;}
   $('#now-name').textContent=chordLabel(ch);
-  const mood=TL.p.moods&&TL.p.moods[i];
-  $('#now-roman').textContent=`${ch.roman} · ${QFR[ch.q]}`+(mood?` · « ${mood} »`:'');
+  $('#now-roman').textContent=`${ch.roman} · ${QFR[ch.q]}`;
   $('#now-tones').textContent=ch.tones.map(nn).join(' · ');
   $('#now-bass').innerHTML=bassActive()?`Basse&nbsp;: <b>${nn(ch.bassSp)}</b>${TL.p.pedal?' (pédale)':''}`:'Sans basse';
   paintKeys(ch,ch.voicing,bassActive()?ch.bass:null);
